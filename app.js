@@ -1,11 +1,10 @@
-import express from "express"
+import express from "express";
+import pic from './routes/pic-route.js';
 
 const app = express();
 
-app.get('/', (res, req) => {
-    req.send("hello world");
-})
+app.use('/pic', pic)
 
-app.listen(3000, (res, req) => {
+app.listen(3000, (req, res) => {
     console.log("ok")
 })
