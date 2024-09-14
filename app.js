@@ -1,10 +1,14 @@
 import express from "express";
-import pic from './routes/pic-route.js';
+
+import config from './src/config/config.js';
+import auth from './src/routes/auth-routes.js';
+import pic from './src/routes/pic-route.js';
 
 const app = express();
 
-app.use('/pic', pic)
+app.listen(config.port, () => {
+  console.log(`Server running on port ${config.port}`);
+});
 
-app.listen(3000, (req, res) => {
-    console.log("ok")
-})
+app.use('/auth', auth)
+app.use('/pic', pic)
