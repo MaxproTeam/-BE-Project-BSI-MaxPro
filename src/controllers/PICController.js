@@ -1,5 +1,3 @@
-import express from "express"
-
 const getPIC = (req,res) => {
     res.send("This is get PIC")
 }
