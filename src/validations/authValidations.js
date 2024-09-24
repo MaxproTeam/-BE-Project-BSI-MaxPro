@@ -4,37 +4,43 @@ const loginUserSchema = Joi.object({
   username: Joi.string()
       .required()
       .messages({
-          'string.empty': 'Kolom username harus diisi.'
+          'string.empty': 'Nama pengguna wajib diisi.',
+          'any.required': 'Nama pengguna wajib diisi.'
       }),
   
   password: Joi.string()
-      .min(8)
-      .pattern(new RegExp(/[a-z]/))
-      .pattern(new RegExp(/[A-Z]/))
-      .pattern(new RegExp(/\d/))
-      .pattern(new RegExp(/[\W_]/))
       .required()
       .messages({
-          'string.empty': 'Kolom kata sandi harus diisi.',
-          'string.min': 'Kata sandi harus terdiri dari minimal 8 karakter.',
-          'string.pattern.base': {
-              '/[a-z]/': 'Kata sandi harus mengandung setidaknya satu huruf kecil.',
-              '/[A-Z]/': 'Kata sandi harus mengandung setidaknya satu huruf besar.',
-              '/\d/': 'Kata sandi harus mengandung setidaknya satu nomor.',
-              '/[\W_]/': 'Kata sandi harus mengandung setidaknya satu karakter khusus (@, #, $, etc.).'
-          }
-      })
-      .custom((value, helpers) => {
-          if (commonPasswords.includes(value)) {
-              return helpers.message('Kata sandi terlalu umum, harap pilih kata sandi yang lebih aman.');
-          }
-
-          return value;
+            'string.empty': 'Password wajib diisi.',
+            'any.required': 'Password wajib diisi.'
       })
 });
 
-// const registerUserSchema = Joi.object({
+const registrationSchema = Joi.object({
+    fullname: Joi.string()
+        .required()
+        .messages({
+            'string.base': 'Nama pengguna harus berupa string.',
+            'string.empty': 'Nama pengguna wajib diisi.',
+            'any.required': 'Nama pengguna wajib diisi.'
+        }),
     
-// });
+    email: Joi.string()
+        .email({ tlds: { allow: true } })
+        .messages({
+            'string.base': 'Email harus berupa string.',
+            'string.email': 'Masukkan alamat email yang valid.'
+        }),
+    
+    password: Joi.string()
+        .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,30}$'))
+        .required()
+        .messages({
+            'string.base': 'Password harus berupa string.',
+            'string.empty': 'Password wajib diisi.',
+            'string.pattern.base': 'Password minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter spesial.',
+            'any.required': 'Password wajib diisi.'
+        })
+});
 
-export {loginUserSchema};
+export {loginUserSchema, registrationSchema};
