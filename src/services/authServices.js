@@ -1,7 +1,12 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import htmlspecialchars from 'htmlspecialchars';
 import { v4 as uuidv4 } from 'uuid';
-import { getUserById, getUserByUsername, createUser, createUserProfile } from '../models/UserModel.js';
+
+import { getUserSessions, getUserSessionById, createUserSession } from '../models/UserSessionModel.js';
+import { getUserProfileById, getUserProfileByUserId, createUserProfile } from '../models/UserProfileModel.js';
+import { getUserById, getUserByUsername, createUser } from '../models/UserModel.js';
+
 import getWIBTime from '../utils/time.js';
 import createSlug from '../utils/slug.js';
 import generateUniqueNumber from '../utils/generateNumber.js';
@@ -16,15 +21,30 @@ const authServices = {
 
       const [user] = await getUserByUsername(username);
 
-      if (!user) return { status_code : 400, message : 'Bad Request', errors: 'Akun tidak terdaftar.' };
+      if (!user) return { status_code : 400, message : 'Bad Request', errors: 'Username atau Password salah.' };
 
       const match = await bcrypt.compare(password, user.password);
       if (!match) return { status_code : 400, message : 'Bad Request', errors: 'Username atau Password salah.' };
 
-      return {};
+      const [userProfile] = await getUserProfileByUserId(user.id);
+
+      const userSession = await createUserSession({
+        id : uuidv4(),
+        userid : userProfile.id,
+        token : crypto.randomBytes(16).toString('base64url'),
+        expiredAt : getWIBTime(24),
+        createdAt : getWIBTime(),
+        updatedAt : getWIBTime()
+      });
+
+      return {userProfile, userSession};
 
     } catch (err) {
-      return { status_code : 500, message : 'Internal Server Error', errors: err.message };
+      return res.status(500).json({
+        status_code: 500,
+        message: 'Internal Server Error',
+        errors: err.message
+      });
     }
   },
 
@@ -78,7 +98,11 @@ const authServices = {
       return {};
 
     } catch (err) {
-      return { status_code : 500, message : 'Internal Server Error', errors: err.message };
+      return res.status(500).json({
+        status_code: 500,
+        message: 'Internal Server Error',
+        errors: err.message
+      });
     }
   },
 };

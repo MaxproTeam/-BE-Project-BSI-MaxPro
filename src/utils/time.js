@@ -1,4 +1,4 @@
-const getWIBTime = () => {
+const getWIBTime = (hoursToAdd = 0) => {
     const currentUTC = new Date();
 
     // Jakarta (WIB) is UTC+7, so calculate Jakarta time using the UTC time
@@ -6,7 +6,7 @@ const getWIBTime = () => {
         currentUTC.getUTCFullYear(),
         currentUTC.getUTCMonth(),
         currentUTC.getUTCDate(),
-        currentUTC.getUTCHours() + 7,  // Adjust for UTC+7
+        currentUTC.getUTCHours() + 7 + hoursToAdd,  // Adjust for UTC+7
         currentUTC.getUTCMinutes(),
         currentUTC.getUTCSeconds()
     );

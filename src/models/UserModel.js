@@ -24,13 +24,4 @@ const createUser = async (data) => {
     return user[0];
 }
 
-const createUserProfile = async (data) => {
-    await db.query('INSERT INTO user_profiles (id, userid, full_name, agency_project, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', [
-        data.userprofilesid, data.userid, data.fullname, data.agency_project, data.role, data.createdAt, data.updatedAt
-    ]);
-
-    const [user] = await db.query('SELECT * FROM user_profiles WHERE id = ?', [data.userprofilesid]);
-    return user[0];
-}
-
-export {getUsers, getUserById, getUserByUsername, createUser, createUserProfile};
+export {getUsers, getUserById, getUserByUsername, createUser};
