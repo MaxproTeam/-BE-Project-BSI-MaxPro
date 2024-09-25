@@ -38,8 +38,7 @@ const loginUser = async (req, res) => {
       message: "Login successful.",
       data: { 
         user: result.userProfile,
-        token: result.userSession.token,
-        token_expired: result.userSession.expired_at
+        authorization: 'Key:' + Buffer.from(result.userProfile.id).toString('base64'),
       }
     });
 

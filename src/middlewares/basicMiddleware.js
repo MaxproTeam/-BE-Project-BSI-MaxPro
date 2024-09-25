@@ -8,15 +8,15 @@ import config from '../config/config.js';
 const basicMiddleware = (app) => {
     app.use(helmet());
 
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-
-    app.use(cookieParser(config.cookie_parse));
-
     app.use(cors({
         origin: config.cors_origin,
         credentials: true
     }));
+
+    app.use(cookieParser());
+
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
 }
 
 export default basicMiddleware;

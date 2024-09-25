@@ -1,5 +1,14 @@
-const getPIC = (req,res) => {
-    res.send("This is get PIC")
+const getPIC = (req, res) => {
+    try {
+        
+    } catch (err) {
+        return res.status(500).json({
+            status_code : 500,
+            message : 'Internal Server Error',
+            errors : err.message
+        })
+    }
+    
 }
 
 const storePIC = (req,res) => {
@@ -13,6 +22,5 @@ const  updatePIC = (req,res) => {
 const  deletePIC = (req,res) => {
     res.send("This is delete PIC")
 }
-
 
 export {getPIC, storePIC, updatePIC, deletePIC};
