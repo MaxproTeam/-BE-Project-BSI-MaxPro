@@ -12,7 +12,8 @@ const config = {
     database_password : process.env.DB_PASSWORD,
     session_secret : process.env.SESSION_SECRET,
     session_expired : process.env.SESSION_EXPIRED,
-    cors_origin : process.env.CORS_ORIGIN
+    cors_origin : process.env.CORS_ORIGIN,
+    cookie_parse : process.env.COOKIE_PARSER_SECRET
 };
 
 export default config;
