@@ -1,13 +1,18 @@
 import db from '../config/database.js';
 
 const getUserSessions = async () => {
-    const [users] = await db.query('SELECT * FROM user_sessions')
-    return users;
+    const [sessions] = await db.query('SELECT * FROM user_sessions')
+    return sessions;
 }
 
 const getUserSessionById = async (params) => {
-    const [user] = await db.query(`SELECT * FROM user_sessions WHERE id = ?`, [params]);
-    return user;
+    const [session] = await db.query(`SELECT * FROM user_sessions WHERE id = ?`, [params]);
+    return session;
+}
+
+const checkCredentials = async (params) => {
+    const [session] = await db.query(`SELECT * FROM user_sessions WHERE token = ?`, [params]);
+    return session;
 }
 
 const createUserSession = async (data) => {
@@ -19,4 +24,4 @@ const createUserSession = async (data) => {
     return session[0];
 }
 
-export {getUserSessions, getUserSessionById, createUserSession};
+export {getUserSessions, getUserSessionById, checkCredentials, createUserSession};

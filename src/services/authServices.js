@@ -3,9 +3,9 @@ import crypto from 'crypto';
 import htmlspecialchars from 'htmlspecialchars';
 import { v4 as uuidv4 } from 'uuid';
 
-import { getUserSessions, getUserSessionById, createUserSession } from '../models/UserSessionModel.js';
-import { getUserProfileById, getUserProfileByUserId, createUserProfile } from '../models/UserProfileModel.js';
-import { getUserById, getUserByUsername, createUser } from '../models/UserModel.js';
+import { createUserSession } from '../models/UserSessionModel.js';
+import { getUserProfileByUserId, createUserProfile } from '../models/UserProfileModel.js';
+import { getUserByUsername, createUser } from '../models/UserModel.js';
 
 import getWIBTime from '../utils/time.js';
 import createSlug from '../utils/slug.js';
