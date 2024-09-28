@@ -5,8 +5,6 @@ const authorization = async (req, res, next) => {
         const userAuthorization = req.header('Authorization')?.replace('Key:', '');
         const credentials = req.cookies.credentials;
 
-        console.log([credentials, userAuthorization])
-
         if (!userAuthorization || !credentials) {
             return res.status(401).json({
                 status_code: 401,
@@ -24,6 +22,8 @@ const authorization = async (req, res, next) => {
                 errors: isCredentialsValid.errors
             });
         }
+
+        req.userAuthorization = Buffer.from(userAuthorization, 'base64').toString('utf-8');
 
         next();
     } catch (err) {
