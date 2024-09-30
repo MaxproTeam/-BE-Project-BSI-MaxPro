@@ -8,7 +8,7 @@ import config from '../config/config.js';
 const basicMiddleware = (app) => {
     app.use(helmet());
 
-    const allowedOrigins = ['https://bsi-max-pro.vercel.app', 'http://localhost:8000'];
+    const allowedOrigins = ['https://bsi-max-pro.vercel.app'];
 
     app.use(cors({
         origin: (origin, callback) => {

@@ -1,5 +1,5 @@
 import picServices from "../services/picServices.js";
-import { attedanceSchema } from "../validations/picValidations.js";
+import { attedanceSchema } from "../validations/attedanceValidations.js";
 
 const setPICAttedance = async (req, res) => {
     try {
@@ -55,6 +55,7 @@ const setPICAttedance = async (req, res) => {
 
 const getPICAttedances = async (req, res) => {
     try {
+        const authorization = req.userAuthorization;
         const { page = 1, limit = 7 } = req.query;
         const offset = (page - 1) * limit;
 
@@ -72,7 +73,7 @@ const getPICAttedances = async (req, res) => {
             });
         }
 
-        const result = await picServices.getAttedances({limit : parseInt(limit), offset});
+        const result = await picServices.getAttedances({limit : parseInt(limit), offset, authorization});
         if (result.errors) {
             return res.status(400).json({ 
                 status_code: result.status_code,
@@ -81,7 +82,7 @@ const getPICAttedances = async (req, res) => {
             });
         }
 
-        const result2 = await picServices.getCountAttedances();
+        const result2 = await picServices.getCountAttedances({authorization});
         if (result2.errors) {
             return res.status(400).json({ 
                 status_code: resul2.status_code,
