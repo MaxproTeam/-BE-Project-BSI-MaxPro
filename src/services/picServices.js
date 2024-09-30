@@ -1,9 +1,8 @@
 import htmlspecialchars from 'htmlspecialchars';
 import { v4 as uuidv4 } from 'uuid';
-import gpsd from 'node-gpsd';
 
 import { getUserProfileById } from '../models/UserProfileModel.js';
-import { getUserAttedances, getCountUserAttedances, createUserAttedance } from '../models/AttedanceModel.js';
+import { getUserAttedancesByUserId, getCountUserAttedancesByUserId, createUserAttedance } from '../models/AttedanceModel.js';
 
 import getWIBTime from '../utils/time.js';
 
@@ -51,7 +50,13 @@ const picServices = {
   },
   getAttedances: async (params) => {
     try {
-      const userAttedances = await getUserAttedances(params);
+      let { limit, offset, authorization } = {
+        limit : htmlspecialchars(params.limit),
+        offset : htmlspecialchars(params.offset),
+        authorization: htmlspecialchars(params.authorization)
+      };
+
+      const userAttedances = await getUserAttedancesByUserId({limit: parseInt(limit), offset : parseInt(offset), authorization});
   
       if (!userAttedances) {
         return { status_code: 400, message: 'Bad Request', errors: 'Data not found.' };
@@ -76,9 +81,10 @@ const picServices = {
       };
     }
   },
+
   getCountAttedances: async (params) => {
     try {
-      const [totalResults] = await getCountUserAttedances();
+      const [totalResults] = await getCountUserAttedancesByUserId(params.authorization);
   
       if (!totalResults) {
         return { status_code: 400, message: 'Bad Request', errors: 'Total user attedances not found.' };

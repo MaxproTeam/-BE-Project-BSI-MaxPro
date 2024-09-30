@@ -1,18 +1,10 @@
 import db from '../config/database.js';
 
-const getUserAttedances = async (data) => {
-    if(data) {
-        const [userAttedances] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
-            FROM user_attedances 
-            INNER JOIN user_status ON user_attedances.status=user_status.id
-            LIMIT ? OFFSET ?`, [data.limit, data.offset])
-        return userAttedances;
-    }else {
-        const [userAttedances] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
-            FROM user_attedances 
-            INNER JOIN user_status ON user_attedances.status=user_status.id`)
-        return userAttedances;
-    }
+const getUserAttedances = async () => {
+    const [userAttedances] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
+        FROM user_attedances 
+        INNER JOIN user_status ON user_attedances.status=user_status.id`)
+    return userAttedances;
 }
 
 const getUserAttedanceById = async (params) => {
@@ -23,16 +15,25 @@ const getUserAttedanceById = async (params) => {
     return userAttedance;
 }
 
-const getUserAttedancesByUserId = async (params) => {
-    const [userAttedance] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status 
-        FROM user_attedances 
-        INNER JOIN user_status ON user_attedances.status=user_status.id 
-        WHERE user_attedances.userid = ?`, [params]);
-    return userAttedance;
+const getUserAttedancesByUserId = async (data) => {
+    if(data) {
+        const [userAttedances] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
+            FROM user_attedances 
+            INNER JOIN user_status ON user_attedances.status=user_status.id
+            WHERE user_attedances.userid = ?
+            LIMIT ? OFFSET ?`, [data.authorization, data.limit, data.offset])
+        return userAttedances;
+    }else {
+        const [userAttedances] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
+            FROM user_attedances 
+            INNER JOIN user_status ON user_attedances.status=user_status.id
+            WHERE user_attedances.userid = ?`, [data.authorization])
+        return userAttedances;
+    }
 }
 
-const getCountUserAttedances = async () => {
-    const [totalUserAttedance] = await db.query(`SELECT COUNT(*) as total FROM user_attedances`);
+const getCountUserAttedancesByUserId = async (params) => {
+    const [totalUserAttedance] = await db.query(`SELECT COUNT(*) as total FROM user_attedances WHERE userid= ?`, [params]);
     return totalUserAttedance;
 }
 
@@ -48,4 +49,4 @@ const createUserAttedance = async (data) => {
     return userAttedance[0];
 }
 
-export { getUserAttedances, getUserAttedanceById, getUserAttedancesByUserId, getCountUserAttedances, createUserAttedance };
+export { getUserAttedances, getUserAttedanceById, getUserAttedancesByUserId, getCountUserAttedancesByUserId, createUserAttedance };
