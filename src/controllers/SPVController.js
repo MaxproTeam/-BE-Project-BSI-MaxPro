@@ -113,12 +113,4 @@ const getSPVAttedances = async (req, res) => {
     }
 }
 
-const  updateSPV = (req,res) => {
-    res.send("This is update SPV")
-}
-
-const  deleteSPV = (req,res) => {
-    res.send("This is delete SPV")
-}
-
-export {setSPVAttedance, getSPVAttedances, updateSPV, deleteSPV};
+export {setSPVAttedance, getSPVAttedances};

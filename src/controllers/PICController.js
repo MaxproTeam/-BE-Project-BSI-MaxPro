@@ -113,12 +113,4 @@ const getPICAttedances = async (req, res) => {
     }
 }
 
-const  updatePIC = (req,res) => {
-    res.send("This is update PIC")
-}
-
-const  deletePIC = (req,res) => {
-    res.send("This is delete PIC")
-}
-
-export {setPICAttedance, getPICAttedances, updatePIC, deletePIC};
+export { setPICAttedance, getPICAttedances };
