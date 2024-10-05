@@ -8,13 +8,14 @@ import config from '../config/config.js';
 const basicMiddleware = (app) => {
     app.use(helmet());
 
-    const allowedOrigins = ['https://bsi-max-pro.vercel.app'];
+    const allowedOrigins = ['http://localhost:8000'];
 
     app.use(cors({
         origin: (origin, callback) => {
             if (!origin || allowedOrigins.indexOf(origin) !== -1) {
                 callback(null, origin);
             } else {
+                console.log(origin)
                 callback(new Error('Not allowed by CORS'));
             }
         },

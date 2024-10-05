@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getUserProfileById } from '../models/UserProfileModel.js';
 import { getUserAttedancesByUserId, getCountUserAttedancesByUserId, createUserAttedance } from '../models/AttedanceModel.js';
 
-import getWIBTime from '../utils/time.js';
+import { getWIBTime } from '../utils/time.js';
 
 const spvServices = {
   setAttedance: async (params) => {
@@ -29,6 +29,7 @@ const spvServices = {
       const userAttedance = await createUserAttedance({
         id: uuidv4(),
         userid: userProfile.id,
+        company_id: userProfile.company,
         start_attedance: getWIBTime(),
         latitude: latitude,
         longitude: longitude,

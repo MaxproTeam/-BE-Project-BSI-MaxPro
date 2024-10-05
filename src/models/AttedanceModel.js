@@ -37,9 +37,31 @@ const getCountUserAttedancesByUserId = async (params) => {
     return totalUserAttedance;
 }
 
+const getPICAttedancesByCompany = async (params) => {
+    const [picAttedances] = await db.query(`
+        SELECT user_attedances.id, user_attedances.start_attedance, user_attedances.end_attedance, user_profiles.full_name, user_status.status
+        FROM user_attedances
+        INNER JOIN user_profiles ON user_attedances.userid=user_profiles.id
+        INNER JOIN user_status ON user_attedances.status=user_status.id
+        WHERE user_profiles.role= 1 AND user_attedances.company_id = ?`, [params.company])
+
+    return picAttedances;
+}
+
+const getSPVAttedancesByCompany = async (params) => {
+    const [spvAttedances] = await db.query(`
+        SELECT user_attedances.id, user_attedances.start_attedance, user_attedances.end_attedance, user_profiles.full_name, user_status.status
+        FROM user_attedances
+        INNER JOIN user_profiles ON user_attedances.userid=user_profiles.id
+        INNER JOIN user_status ON user_attedances.status=user_status.id
+        WHERE user_profiles.role= 2 AND user_attedances.company_id = ?`, [params.company])
+
+    return spvAttedances;
+}
+
 const createUserAttedance = async (data) => {
-    await db.query('INSERT INTO user_attedances (id, userid, start_attedance, latitude, longitude, end_attedance, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-        data.id, data.userid, data.start_attedance, data.latitude, data.longitude, data.end_attedance, data.status, data.createdAt, data.updatedAt
+    await db.query('INSERT INTO user_attedances (id, userid, company_id, start_attedance, latitude, longitude, end_attedance, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        data.id, data.userid, data.company_id, data.start_attedance, data.latitude, data.longitude, data.end_attedance, data.status, data.createdAt, data.updatedAt
     ]);
 
     const [userAttedance] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status 
@@ -49,4 +71,4 @@ const createUserAttedance = async (data) => {
     return userAttedance[0];
 }
 
-export { getUserAttedances, getUserAttedanceById, getUserAttedancesByUserId, getCountUserAttedancesByUserId, createUserAttedance };
+export { getUserAttedances, getUserAttedanceById, getUserAttedancesByUserId, getCountUserAttedancesByUserId, getPICAttedancesByCompany, getSPVAttedancesByCompany, createUserAttedance };

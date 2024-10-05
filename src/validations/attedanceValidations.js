@@ -49,11 +49,11 @@ const attedanceSchema = {
         .max(100)
         .default(10)
         .messages({
-          'number.base': 'Page size must be a number.',
-          'number.integer': 'Page size must be an integer.',
-          'number.min': 'Page size must be at least 1.',
-          'number.max': 'Page size must be at most 100.',
-          'any.default': 'Page size defaults to 10 if not provided.'
+          'number.base': 'Limit must be a number.',
+          'number.integer': 'Limit must be an integer.',
+          'number.min': 'Limit must be at least 1.',
+          'number.max': 'Limit must be at most 100.',
+          'any.default': 'Limit defaults to 10 if not provided.'
         }),
     })
 }

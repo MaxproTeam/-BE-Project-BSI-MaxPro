@@ -7,7 +7,7 @@ import { createUserSession } from '../models/UserSessionModel.js';
 import { getUserProfileByUserId, createUserProfile } from '../models/UserProfileModel.js';
 import { getUserByUsername, createUser } from '../models/UserModel.js';
 
-import getWIBTime from '../utils/time.js';
+import { getWIBTime } from '../utils/time.js';
 import createSlug from '../utils/slug.js';
 import generateUniqueNumber from '../utils/generateNumber.js';
 
