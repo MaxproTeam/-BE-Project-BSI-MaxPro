@@ -16,20 +16,28 @@ const getUserAttedanceById = async (params) => {
 }
 
 const getUserAttedancesByUserId = async (data) => {
-    if(data) {
-        const [userAttedances] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
-            FROM user_attedances 
-            INNER JOIN user_status ON user_attedances.status=user_status.id
-            WHERE user_attedances.userid = ?
-            LIMIT ? OFFSET ?`, [data.authorization, data.limit, data.offset])
-        return userAttedances;
-    }else {
-        const [userAttedances] = await db.query(`SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
-            FROM user_attedances 
-            INNER JOIN user_status ON user_attedances.status=user_status.id
-            WHERE user_attedances.userid = ?`, [data.authorization])
-        return userAttedances;
+    let query = `
+        SELECT user_attedances.*, user_status.status, user_attedances.status as attedance_status
+        FROM user_attedances 
+        INNER JOIN user_status ON user_attedances.status = user_status.id
+        WHERE user_attedances.userid = ?
+    `;
+    
+    const queryParams = [data.authorization];
+
+    if (data.limit) {
+        query += ` LIMIT ? `;
+        queryParams.push(parseInt(data.limit, 10));
     }
+
+    if (data.offset) {
+        query += ` OFFSET ? `;
+        queryParams.push(parseInt(data.offset, 10));
+    }
+
+    const [userAttedances] = await db.query(query, queryParams);
+
+    return userAttedances;
 }
 
 const getCountUserAttedancesByUserId = async (params) => {
@@ -38,23 +46,53 @@ const getCountUserAttedancesByUserId = async (params) => {
 }
 
 const getPICAttedancesByCompany = async (params) => {
-    const [picAttedances] = await db.query(`
-        SELECT user_attedances.id, user_attedances.start_attedance, user_attedances.end_attedance, user_profiles.full_name, user_status.status
+    let query = `SELECT user_attedances.id, user_attedances.start_attedance, user_attedances.end_attedance, user_profiles.full_name, user_status.status
         FROM user_attedances
         INNER JOIN user_profiles ON user_attedances.userid=user_profiles.id
         INNER JOIN user_status ON user_attedances.status=user_status.id
-        WHERE user_profiles.role= 1 AND user_attedances.company_id = ?`, [params.company])
+        WHERE user_profiles.role= 1`;
+
+    const queryParams = [];
+
+    if(params && params.company) {
+        query += ` AND user_attedances.company_id = ? `;
+        queryParams.push(params.company);
+    }
+
+    if(params && params.day) {
+        query += ` AND DATE(user_attedances.created_at) = ? `;
+        queryParams.push(params.day)
+    }
+
+    query += `ORDER BY user_attedances.created_at DESC`
+
+    const [picAttedances] = await db.query(query, queryParams)
 
     return picAttedances;
 }
 
 const getSPVAttedancesByCompany = async (params) => {
-    const [spvAttedances] = await db.query(`
-        SELECT user_attedances.id, user_attedances.start_attedance, user_attedances.end_attedance, user_profiles.full_name, user_status.status
+    let query = `SELECT user_attedances.id, user_attedances.start_attedance, user_attedances.end_attedance, user_profiles.full_name, user_status.status
         FROM user_attedances
         INNER JOIN user_profiles ON user_attedances.userid=user_profiles.id
         INNER JOIN user_status ON user_attedances.status=user_status.id
-        WHERE user_profiles.role= 2 AND user_attedances.company_id = ?`, [params.company])
+        WHERE user_profiles.role= 2`;
+
+    const queryParams = [];
+
+    if(params && params.company) {
+        query += ` AND user_attedances.company_id = ? `;
+        queryParams.push(params.company);
+    }
+
+    if(params && params.day) {
+        query += ` AND DATE(user_attedances.created_at) = ? `;
+        queryParams.push(params.day)
+    }
+
+    query += `ORDER BY user_attedances.created_at DESC`
+
+    const [spvAttedances] = await db.query(query, queryParams)
 
     return spvAttedances;
 }

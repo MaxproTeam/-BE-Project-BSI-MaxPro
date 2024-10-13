@@ -55,7 +55,23 @@ const attedanceSchema = {
           'number.max': 'Limit must be at most 100.',
           'any.default': 'Limit defaults to 10 if not provided.'
         }),
-    })
+    }),
+  getPIC : Joi.object({
+    day: Joi.date()
+    .iso()
+    .messages({
+      'date.base': 'Day must be a valid date.',
+      'date.format': 'Day must be in (YYYY-MM-DD) format.' 
+    }),
+  }),
+  getSPV : Joi.object({
+    day: Joi.date()
+    .iso()
+    .messages({
+      'date.base': 'Day must be a valid date.',
+      'date.format': 'Day must be in (YYYY-MM-DD) format.' 
+    }), 
+  }),
 }
 
 export { attedanceSchema };
