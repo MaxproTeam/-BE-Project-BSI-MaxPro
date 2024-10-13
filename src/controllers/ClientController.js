@@ -1,11 +1,26 @@
 import clientServices from '../services/clientServices.js';
+import { attedanceSchema } from '../validations/attedanceValidations.js';
 import { workOrderSchema } from '../validations/workOrderValidation.js';
 
 const getPICAttedances = async (req, res) => {
   try {
       const authorization = req.userAuthorization;
 
-      const result = await clientServices.getPICAttedances({authorization});
+      const { error } = attedanceSchema.getPIC.validate(req.query, { abortEarly: false })
+      if (error) {
+          const errors = {};
+          error.details.forEach(detail => {
+              errors[detail.context.key] = detail.message;
+          });
+      
+          return res.status(400).json({
+              status_code: 400,
+              message: 'Bad Request',
+              errors: errors
+          });
+      }
+
+      const result = await clientServices.getPICAttedances({authorization, body : req.query});
       if (result.errors) {
           return res.status(400).json({ 
               status_code: result.status_code,
@@ -34,7 +49,21 @@ const getSPVAttedances = async (req, res) => {
   try {
       const authorization = req.userAuthorization;
 
-      const result = await clientServices.getSPVAttedances({authorization});
+      const { error } = attedanceSchema.getSPV.validate(req.query, { abortEarly: false })
+      if (error) {
+          const errors = {};
+          error.details.forEach(detail => {
+              errors[detail.context.key] = detail.message;
+          });
+      
+          return res.status(400).json({
+              status_code: 400,
+              message: 'Bad Request',
+              errors: errors
+          });
+      }
+
+      const result = await clientServices.getSPVAttedances({authorization, body : req.query});
       if (result.errors) {
           return res.status(400).json({ 
               status_code: result.status_code,
@@ -116,7 +145,7 @@ const getWorkOrders = async (req, res) => {
           });
       }
 
-      const result = await clientServices.getWorkOrders(req.query);
+      const result = await clientServices.getWorkOrders({ authorization: req.userAuthorization, body: req.query});
       if (result.errors) {
           return res.status(400).json({ 
               status_code: result.status_code,
@@ -133,12 +162,22 @@ const getWorkOrders = async (req, res) => {
               errors: supervisor.errors
           });
       }
+
+        const pic = await clientServices.getCountPIC();
+        if (pic.errors) {
+            return res.status(400).json({ 
+                status_code: pic.status_code,
+                message: pic.message,
+                errors: pic.errors
+            });
+        }
       
       return res.status(201).json({
           status_code : 201,
           message : 'Successfully fetch data work orders.',
           data : {
               work_orders : result.work_orders,
+              pic: pic,
               supervisor: supervisor.spv
           }
       })

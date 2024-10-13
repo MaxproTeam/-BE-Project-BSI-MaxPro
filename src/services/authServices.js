@@ -37,6 +37,10 @@ const authServices = {
         updatedAt : getWIBTime()
       });
 
+      delete userProfile.created_at;
+      delete userProfile.updated_at;
+      delete userProfile.userid;
+
       return {userProfile, userSession};
 
     } catch (err) {

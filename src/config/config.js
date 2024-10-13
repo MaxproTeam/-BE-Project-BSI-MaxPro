@@ -10,6 +10,8 @@ const config = {
     database : process.env.DB_DATABASE,
     database_username : process.env.DB_USERNAME,
     database_password : process.env.DB_PASSWORD,
+    encrypt_key: process.env.ENCRYPTION_KEY,
+    encrypt_iv: process.env.ENCRYPTION_IV,
     session_secret : process.env.SESSION_SECRET,
     session_expired : process.env.SESSION_EXPIRED,
     cors_origin : process.env.CORS_ORIGIN,

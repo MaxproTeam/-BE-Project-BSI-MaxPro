@@ -1,23 +1,35 @@
 import htmlspecialchars from 'htmlspecialchars';
 
-import { getSPVByCompanies, getUserProfileById } from '../models/UserProfileModel.js';
-import { getWorkOrders, createWorkOrder, countWorkOrder } from '../models/WorkOrderModel.js';
+import { getCountPICByCompanies, getCountPICByCompaniesId, getSPVByCompanies, getUserProfileById } from '../models/UserProfileModel.js';
+import { createWorkOrder, countWorkOrder, getWorkOrdersByCompany } from '../models/WorkOrderModel.js';
 
 import { getHoursWIBTime, getWIBTime } from '../utils/time.js';
 import { getPICAttedancesByCompany, getSPVAttedancesByCompany } from '../models/AttedanceModel.js';
 
 const clientServices = {
-  getPICAttedances: async (data) => {
+  getPICAttedances: async (params) => {
     try {
-      const { authorization } = data;
-      
-      const [user] = await getUserProfileById(authorization);
+      const data = {};
 
-      if(!user) {
+      if(params && params.authorization) {
+        data.authorization = params.authorization;
+      }
+      
+      const [userProfile] = await getUserProfileById(data.authorization);
+
+      if(!userProfile) {
         return { status_code: 400, message: 'Bad Request', errors: 'User not found' }
       }
 
-      const pic = await getPICAttedancesByCompany({company: user.company});
+      if(params && userProfile.company_id){
+        data.company = userProfile.company_id
+      }
+
+      if(params && params.body.day) {
+        data.day = htmlspecialchars(params.body.day)
+      }
+
+      const pic = await getPICAttedancesByCompany(data);
       
       if (!pic) {
         return { status_code: 400, message: 'Bad Request', errors: 'PIC attendances not found.' };
@@ -33,17 +45,29 @@ const clientServices = {
       };
     }
   },
-  getSPVAttedances: async (data) => {
+  getSPVAttedances: async (params) => {
     try {
-      const { authorization } = data;
-      
-      const [user] = await getUserProfileById(authorization);
+      const data = {};
 
-      if(!user) {
+      if(params && params.authorization) {
+        data.authorization = params.authorization;
+      }
+      
+      const [userProfile] = await getUserProfileById(data.authorization);
+
+      if(!userProfile) {
         return { status_code: 400, message: 'Bad Request', errors: 'User not found' }
       }
 
-      const spv = await getSPVAttedancesByCompany({company: user.company});
+      if(params && userProfile.company_id){
+        data.company = userProfile.company_id
+      }
+
+      if(params && params.body.day) {
+        data.day = htmlspecialchars(params.body.day)
+      }
+
+      const spv = await getSPVAttedancesByCompany(data);
       
       if (!spv) {
         return { status_code: 400, message: 'Bad Request', errors: 'SPV attendances not found.' };
@@ -80,7 +104,7 @@ const clientServices = {
 
       const dataWorkOrder = await createWorkOrder({
         id: 'WO-' + (result.totalResults + 1),
-        company_id : userProfile.company,
+        company_id : userProfile.company_id,
         client: userProfile.id,
         pic: null,
         workOrder: workOrder, 
@@ -108,25 +132,76 @@ const clientServices = {
   },
   getWorkOrders : async (params) => {
     try {
-      let work_orders;
-      if(Object.keys(params).length > 0) {
-        work_orders = await getWorkOrders({limit : parseInt(htmlspecialchars(params.limit))});
-      } else{
-        work_orders = await getWorkOrders();
-      }
-      
-      if (!work_orders) {
-        return { status_code: 400, message: 'Bad Request', errors: 'Work order not found.' };
+      const data = {};
+
+      if (params && params.authorization) {
+        data.authorization = params.authorization;
       }
 
-      if(Array.isArray(work_orders)) {
-        work_orders.forEach(work_order => {
-          delete work_order.client
-          delete work_order.updated_at
-        })
+      if(params && params.body.filterDay){
+        data.day= htmlspecialchars(params.body.filterDay);
+      }
+
+      if(params && params.body.filter){
+        data.filter= htmlspecialchars(params.body.filter);
+      }
+
+      if(params && params.body.filterDate){
+        data.date= htmlspecialchars(params.body.filterDate);
+      }
+
+      if(params && params.body.status){
+        data.status= parseInt(htmlspecialchars(params.body.status));
+      }
+      
+      if (params && params.body.limit) {
+        data.limit = parseInt(htmlspecialchars(params.body.limit));
+      }
+
+      const [userProfile] = await getUserProfileById(data.authorization)
+
+      if(!userProfile) {
+        return { status_code: 400, message: 'Bad Request', errors: 'User not found' }
+      }
+
+      if(userProfile && userProfile.role) {
+        data.role = userProfile.role;
+      }
+
+      if(userProfile && userProfile.company_id) {
+        data.company = userProfile.company_id;
+      }
+
+      const work_orders = await getWorkOrdersByCompany(data);
+      
+      if (!work_orders) {
+        return { status_code: 400, message: 'Bad Request', errors: 'Work orders not found.' };
       }
 
       return { work_orders };
+
+    } catch (err) {
+      return {
+        status_code: 500,
+        message: 'Internal Server Error',
+        errors: err.message
+      };
+    }
+  },
+  getCountPIC: async (params) => {
+    try {
+      let total;
+      if(params) {
+        [total] = await getCountPICByCompaniesId({id : parseInt(htmlspecialchars(params.id))});
+      }else{
+        total = await getCountPICByCompanies();
+      }
+  
+      if (!total) {
+        return { status_code: 400, message: 'Bad Request', errors: 'TotaL PIC not found.' };
+      }
+
+      return { total };
 
     } catch (err) {
       return {

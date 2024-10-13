@@ -1,9 +1,10 @@
+import { decrypt } from "dotenv";
 import middlewareServices from "../services/middlewareServices.js";
 
 const authorization = async (req, res, next) => {
     try {
-        const userAuthorization = req.header('Authorization')?.replace('Key:', '');
-        const credentials = req.cookies.credentials;
+        const userAuthorization = req.cookies?.key;
+        const credentials = req.cookies?.credentials;
 
         if (!userAuthorization || !credentials) {
             return res.status(401).json({
@@ -23,7 +24,7 @@ const authorization = async (req, res, next) => {
             });
         }
 
-        req.userAuthorization = Buffer.from(userAuthorization, 'base64').toString('utf-8');
+        req.userAuthorization = isCredentialsValid.userAuthorization;
 
         next();
     } catch (err) {

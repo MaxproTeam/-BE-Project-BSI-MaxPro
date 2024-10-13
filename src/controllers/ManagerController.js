@@ -1,4 +1,5 @@
 import managerServices from "../services/MANAGERServices.js";
+import { attedanceSchema } from "../validations/attedanceValidations.js";
 import { companiesSchema } from "../validations/companiesValidations.js";
 import { workOrderSchema } from "../validations/workOrderValidation.js";
 
@@ -144,10 +145,10 @@ const getCompaniesById = async (req, res) => {
 
 const getPICAttedancesByCompany = async (req, res) => {
     try {
-        const { error } = companiesSchema.getCompaniesById.validate(req.params, { abortEarly: false })
-        if (error) {
+        const { errorCompanies } = companiesSchema.getCompaniesById.validate(req.params, { abortEarly: false })
+        if (errorCompanies) {
             const errors = {};
-            error.details.forEach(detail => {
+            errorCompanies.details.forEach(detail => {
                 errors[detail.context.key] = detail.message;
             });
         
@@ -158,7 +159,21 @@ const getPICAttedancesByCompany = async (req, res) => {
             });
         }
 
-        const result = await managerServices.getPICAttedancesByCompany(req.params);
+        const { errorAttendances } = attedanceSchema.getPIC.validate(req.query, { abortEarly: false })
+        if (errorAttendances) {
+            const errors = {};
+            errorAttendances.details.forEach(detail => {
+                errors[detail.context.key] = detail.message;
+            });
+        
+            return res.status(400).json({
+                status_code: 400,
+                message: 'Bad Request',
+                errors: errors
+            });
+        }
+
+        const result = await managerServices.getPICAttedancesByCompany(req.params, req.query);
         if (result.errors) {
             return res.status(400).json({ 
                 status_code: result.status_code,
@@ -199,7 +214,21 @@ const getWorkOrdersByCompany = async (req, res) => {
             });
         }
 
-        const result = await managerServices.getWorkOrdersByCompany(req.params);
+        const { errorWorkOrder } = workOrderSchema.getWorkOrderByCompany.validate(req.query, { abortEarly: false })
+        if (errorWorkOrder) {
+            const errors = {};
+            errorWorkOrder.details.forEach(detail => {
+                errors[detail.context.key] = detail.message;
+            });
+        
+            return res.status(400).json({
+                status_code: 400,
+                message: 'Bad Request',
+                errors: errors
+            });
+        }
+
+        const result = await managerServices.getWorkOrdersByCompany(req.params, req.query);
         if (result.errors) {
             return res.status(400).json({ 
                 status_code: result.status_code,
@@ -240,7 +269,7 @@ const getWorkOrders = async (req, res) => {
             });
         }
 
-        const result = await managerServices.getWorkOrders(req.query);
+        const result = await managerServices.getWorkOrders({ authorization: req.userAuthorization, body: req.query});
         if (result.errors) {
             return res.status(400).json({ 
                 status_code: result.status_code,

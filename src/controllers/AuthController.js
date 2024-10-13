@@ -1,5 +1,7 @@
 import { loginUserSchema, registrationSchema } from '../validations/authValidations.js';
 import authServices from '../services/authServices.js';
+import encrypt from '../utils/encrypt.js';
+import config from '../config/config.js';
 
 const loginUser = async (req, res) => {
   try {
@@ -26,9 +28,22 @@ const loginUser = async (req, res) => {
       });
     }
 
-    res.cookie('credentials', result.userSession.token, {
+    const key = Buffer.from(config.encrypt_key, 'hex');
+    const iv = Buffer.from(config.encrypt_iv, 'hex');
+
+    const credentialsEncrypted = encrypt(result.userSession.token, key, iv);
+    const authorizationKeyEncrypted = encrypt(result.userProfile.id, key, iv);
+
+    res.cookie('credentials', credentialsEncrypted, {
       httpOnly: true,      
-      secure: false,     
+      secure: false,
+      sameSite: 'Strict',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie('key', authorizationKeyEncrypted, {
+      httpOnly: true,      
+      secure: false,
       sameSite: 'Strict',
       maxAge: 24 * 60 * 60 * 1000,
     });
@@ -37,8 +52,7 @@ const loginUser = async (req, res) => {
       status_code: 201,
       message: "Login successful.",
       data: { 
-        user: result.userProfile,
-        authorization: 'Key:' + Buffer.from(result.userProfile.id).toString('base64'),
+        user: result.userProfile
       }
     });
 
